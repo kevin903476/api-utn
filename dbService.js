@@ -65,6 +65,8 @@ class DbService{
       return response;
     } catch (error) {
       console.log(error);
+    }finally{
+        connection.close();
     }
   }
 async getPromedio() {
@@ -81,6 +83,8 @@ async getPromedio() {
       return response;
     } catch (error) {
       console.log(error);
+    }finally{
+        connection.close();
     }
   }
     async EstadisticaEstudianteITI(){
@@ -96,6 +100,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
     async estadisticasGEC(){
@@ -111,6 +117,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
     async estadisticasIg(){
@@ -126,6 +134,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
     async estadisticasAgro(){
@@ -141,6 +151,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
     
@@ -156,6 +168,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error);
+        }finally{
+            connection.close();
         }
     }
     async obtenerUsuario(email){
@@ -171,6 +185,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
     async getUserIti(email){
@@ -186,6 +202,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
 
@@ -202,6 +220,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
     async getUserExt(email){
@@ -217,6 +237,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
     async getUserGec(email){
@@ -232,6 +254,8 @@ async getPromedio() {
             return response;
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
 
@@ -253,6 +277,8 @@ async getPromedio() {
             };
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
 
@@ -272,6 +298,8 @@ async getPromedio() {
             };
         } catch (error) {
             console.log(error)
+        }finally{
+            connection.close();
         }
     }
 
@@ -290,6 +318,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
     async updateByNamePMT(puntuacion_matematico, email){
@@ -307,6 +337,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
     async updateByNamePIM(puntuacion_idioma, email){
@@ -324,6 +356,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
     async updateByNamePPG(puntuacion_idioma, email){
@@ -341,6 +375,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
     async updateByNameAPAR(puntuacion_ar, email){
@@ -358,6 +394,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
 
@@ -376,6 +414,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
 
@@ -394,6 +434,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
 
@@ -412,6 +454,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
 
@@ -430,6 +474,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
 
@@ -448,6 +494,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
     async updateEstadistica(carrera, estudiantes,graduados,insercion){
@@ -464,6 +512,8 @@ async getPromedio() {
         } catch (error) {
             console.log(error)
             return false;
+        }finally{
+            connection.close();
         }
     }
 }
