@@ -1,521 +1,293 @@
 const mysql = require('mysql2');
-let instance = null;
 const dotenv = require('dotenv');
 
 dotenv.config();
 
-const connection = mysql.createConnection({
+// Crear un pool de conexiones
+const pool = mysql.createPool({
     host: process.env.HOST,
     user: process.env.USER,
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
-    port: process.env.DB_PORT
+    port: process.env.DB_PORT,
+    connectionLimit: 20, // Ajusta este valor según tus necesidades
+    queueLimit: 0, // No limitar el número de solicitudes en espera
+    acquireTimeout: 10000 // Tiempo de espera para obtener una conexión (en milisegundos)
 });
 
-connection.connect((err) => {
-    if (err) {
-        console.log(err)
-    }
-    
-    console.log('db '+ connection.state)
-})
+// Promesas para facilitar el uso de async/await
+const poolPromise = pool.promise();
 
-class DbService{
-    static getDbServiceInstance(){
+class DbService {
+    static getDbServiceInstance() {
         return instance ? instance : new DbService();
     }
+
+    constructor() {
+        this.pool = poolPromise;
+    }
+
+    async query(query, params = []) {
+        try {
+            const [results] = await this.pool.query(query, params);
+            return results;
+        } catch (error) {
+            console.error('Error en la consulta:', error);
+            throw error;
+        }
+    }
+
     async getAllData() {
-    try {
-      const response = await new Promise((resolve, reject) => {
-        const query = "SELECT * FROM carrera_iti";
-        connection.query(query, async (err, results) => {
-          if (err) reject(new Error(err.message));
+        try {
+            const results = await this.query("SELECT * FROM carrera_iti");
+            for (let i = 0; i < results.length; i++) {
+                const usuarioResult = await this.query(`SELECT email FROM usuarios WHERE nombre = ?`, [results[i].nombre]);
+                const estadisticasResult = await this.query(`SELECT carrera FROM estadisticas WHERE id = ?`, [results[i].id_estadistica]);
 
-          
-          //Agarrar el campo email
-          for (let i = 0; i < results.length; i++) {
-            
-            const usuarioQuery = `SELECT email FROM usuarios WHERE nombre = '${results[i].nombre}'`;
-            const usuarioResult = await new Promise((resolve, reject) => {
-              connection.query(usuarioQuery, (err, userResult) => {
-                if (err) reject(new Error(err.message));
-                resolve(userResult[0]?.email);
-              });
-            });
-
-            //Agarrar el campo carrera
-            const estadisticasQuery = `SELECT carrera FROM estadisticas WHERE id = '${results[i].id_estadistica}'`;
-            const estadisticasResult = await new Promise((resolve, reject) => {
-              connection.query(estadisticasQuery, (err, statsResult) => {
-                if (err) reject(new Error(err.message));
-                resolve(statsResult[0]?.nombre_carrera);
-              });
-            });
-
-        
-            results[i].email = usuarioResult;
-            results[i].carrera = estadisticasResult;
-          }
-
-          resolve(results);
-        });
-      });
-
-      console.log(response);
-      return response;
-    } catch (error) {
-      console.log(error);
-    }finally{
-        connection.close();
-    }
-  }
-async getPromedio() {
-    try {
-      const response = await new Promise((resolve, reject) => {
-        const query = "SELECT email, carrera, promedio, DATE_FORMAT(fecha, '%d-%m-%Y') as fecha_formateada FROM promedios ORDER BY promedio DESC";
-        connection.query(query, async (err, results) => {
-          if (err) reject(new Error(err.message));
-          resolve(results);
-        });
-      });
-
-      console.log(response);
-      return response;
-    } catch (error) {
-      console.log(error);
-    }finally{
-        connection.close();
-    }
-  }
-    async EstadisticaEstudianteITI(){
-        try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT estudiantes,graduados,insercion FROM estadisticas WHERE carrera= 'carrera_iti'"
-                connection.query(query, (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
+                results[i].email = usuarioResult[0]?.email;
+                results[i].carrera = estadisticasResult[0]?.nombre_carrera;
+            }
+            return results;
         } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
-        }
-    }
-    async estadisticasGEC(){
-        try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT estudiantes,graduados,insercion FROM estadisticas WHERE carrera= 'carrera_gec'"
-                connection.query(query, (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
-        } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
-        }
-    }
-    async estadisticasIg(){
-        try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT estudiantes,graduados,insercion FROM estadisticas WHERE carrera= 'carrera_ig'"
-                connection.query(query, (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
-        } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
-        }
-    }
-    async estadisticasAgro(){
-        try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT estudiantes,graduados,insercion FROM estadisticas WHERE carrera= 'carrera_agro'"
-                connection.query(query, (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
-        } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
-        }
-    }
-    
-    async  validarUser(email) {
-        try {
-            const response = await new Promise((resolve, reject) => {
-                const query = "SELECT * FROM usuarios WHERE email = ?";
-                connection.query(query, [email], (err, results) => {
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                });
-            });
-            return response;
-        } catch (error) {
-            console.log(error);
-        }finally{
-            connection.close();
-        }
-    }
-    async obtenerUsuario(email){
-        try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT * FROM usuarios WHERE email = ? ";
-                connection.query(query,[email], (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
-        } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
-        }
-    }
-    async getUserIti(email){
-        try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT * FROM carrera_iti WHERE email = ? ";
-                connection.query(query,[email], (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
-        } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
+            console.error(error);
         }
     }
 
-    async getUserAgro(email){
+    async getPromedio() {
         try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT * FROM carrera_agro WHERE email = ? ";
-                connection.query(query,[email], (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
+            const results = await this.query("SELECT email, carrera, promedio, DATE_FORMAT(fecha, '%d-%m-%Y') as fecha_formateada FROM promedios ORDER BY promedio DESC");
+            return results;
         } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
-        }
-    }
-    async getUserExt(email){
-        try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT * FROM carrera_ext WHERE email = ? ";
-                connection.query(query,[email], (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
-        } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
-        }
-    }
-    async getUserGec(email){
-        try {
-            const response = await new Promise((resolve, reject)=>{
-                const query = "SELECT * FROM carrera_gec WHERE email = ? ";
-                connection.query(query,[email], (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results);
-                }) 
-            });
-            console.log(response);
-            return response;
-        } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
+            console.error(error);
         }
     }
 
-    async insertUser(name,email,contra){
+    async EstadisticaEstudianteITI() {
         try {
-            const insertUser = await new Promise((resolve, reject)=>{
-                const query = "INSERT INTO usuarios (nombre,email,contra) VALUES (?,?,?)";
-                connection.query(query,[name,email,contra], (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results.insertUser);
-                }) 
-            });
+            const results = await this.query("SELECT estudiantes,graduados,insercion FROM estadisticas WHERE carrera= 'carrera_iti'");
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
+    async estadisticasGEC() {
+        try {
+            const results = await this.query("SELECT estudiantes,graduados,insercion FROM estadisticas WHERE carrera= 'carrera_gec'");
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async estadisticasIg() {
+        try {
+            const results = await this.query("SELECT estudiantes,graduados,insercion FROM estadisticas WHERE carrera= 'carrera_ig'");
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async estadisticasAgro() {
+        try {
+            const results = await this.query("SELECT estudiantes,graduados,insercion FROM estadisticas WHERE carrera= 'carrera_agro'");
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async validarUser(email) {
+        try {
+            const results = await this.query("SELECT * FROM usuarios WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async obtenerUsuario(email) {
+        try {
+            const results = await this.query("SELECT * FROM usuarios WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async getUserIti(email) {
+        try {
+            const results = await this.query("SELECT * FROM carrera_iti WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async getUserAgro(email) {
+        try {
+            const results = await this.query("SELECT * FROM carrera_agro WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async getUserExt(email) {
+        try {
+            const results = await this.query("SELECT * FROM carrera_ext WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async getUserGec(email) {
+        try {
+            const results = await this.query("SELECT * FROM carrera_gec WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async insertUser(name, email, contra) {
+        try {
+            const results = await this.query("INSERT INTO usuarios (nombre, email, contra) VALUES (?, ?, ?)", [name, email, contra]);
             return {
-                nombre : name,
-                email : email,
-                contra : contra
-
+                nombre: name,
+                email: email,
+                contra: contra
             };
         } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
+            console.error(error);
         }
     }
 
-    async insertNewUser(name,fecha){
+    async insertNewUser(name, fecha) {
         try {
-            const insertUser = await new Promise((resolve, reject)=>{
-                const query = "INSERT INTO carrera_iti (nombre,Fecha) VALUES (?,?)";
-                connection.query(query,[name], (err , results)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(results.insertUser);
-                }) 
-            });
-
+            const results = await this.query("INSERT INTO carrera_iti (nombre, Fecha) VALUES (?, ?)", [name, fecha]);
             return {
-                nombre : name,
-                fecha  : fecha
+                nombre: name,
+                fecha: fecha
             };
         } catch (error) {
-            console.log(error)
-        }finally{
-            connection.close();
+            console.error(error);
         }
     }
 
-    async updateByNamePLG(puntuacion_logico, email){
+    async updateByNamePLG(puntuacion_logico, email) {
         try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_iti SET puntuacion_logico = ? WHERE email = ?";
-                connection.query(query, [puntuacion_logico, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
+            const result = await this.query("UPDATE carrera_iti SET puntuacion_logico = ? WHERE email = ?", [puntuacion_logico, email]);
+            return result.affectedRows === 1;
         } catch (error) {
-            console.log(error)
+            console.error(error);
             return false;
-        }finally{
-            connection.close();
-        }
-    }
-    async updateByNamePMT(puntuacion_matematico, email){
-        try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_iti SET puntuacion_matematico = ? WHERE email = ?"
-                connection.query(query, [puntuacion_matematico, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
-        } catch (error) {
-            console.log(error)
-            return false;
-        }finally{
-            connection.close();
-        }
-    }
-    async updateByNamePIM(puntuacion_idioma, email){
-        try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_iti SET puntuacion_idioma = ? WHERE email = ?"
-                connection.query(query, [puntuacion_idioma, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
-        } catch (error) {
-            console.log(error)
-            return false;
-        }finally{
-            connection.close();
-        }
-    }
-    async updateByNamePPG(puntuacion_idioma, email){
-        try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_iti SET puntuacion_progra = ? WHERE email = ?"
-                connection.query(query, [puntuacion_idioma, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
-        } catch (error) {
-            console.log(error)
-            return false;
-        }finally{
-            connection.close();
-        }
-    }
-    async updateByNameAPAR(puntuacion_ar, email){
-        try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_agro SET puntuacion_agro = ? WHERE email = ?"
-                connection.query(query, [puntuacion_ar, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
-        } catch (error) {
-            console.log(error)
-            return false;
-        }finally{
-            connection.close();
         }
     }
 
-    async updateByNameAPCI(puntuacion_ci, email){
+    async updateByNamePMT(puntuacion_matematico, email) {
         try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_agro SET puntuacion_ciencias = ? WHERE email = ?"
-                connection.query(query, [puntuacion_ci, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
+            const result = await this.query("UPDATE carrera_iti SET puntuacion_matematico = ? WHERE email = ?", [puntuacion_matematico, email]);
+            return result.affectedRows === 1;
         } catch (error) {
-            console.log(error)
+            console.error(error);
             return false;
-        }finally{
-            connection.close();
         }
     }
 
-    async updateByNameAPIG(puntuacion_ig, email){
+    async updateByNamePIM(puntuacion_idioma, email) {
         try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_agro SET puntuacion_ingles = ? WHERE email = ?"
-                connection.query(query, [puntuacion_ig, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
+            const result = await this.query("UPDATE carrera_iti SET puntuacion_idioma = ? WHERE email = ?", [puntuacion_idioma, email]);
+            return result.affectedRows === 1;
         } catch (error) {
-            console.log(error)
+            console.error(error);
             return false;
-        }finally{
-            connection.close();
         }
     }
 
-    async updateByNameAPMT(puntuacion_mt, email){
+    async updateByNamePPG(puntuacion_progra, email) {
         try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_agro SET puntuacion_mate =  ? WHERE email = ?"
-                connection.query(query, [puntuacion_mt, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
+            const result = await this.query("UPDATE carrera_iti SET puntuacion_progra = ? WHERE email = ?", [puntuacion_progra, email]);
+            return result.affectedRows === 1;
         } catch (error) {
-            console.log(error)
+            console.error(error);
             return false;
-        }finally{
-            connection.close();
         }
     }
 
-    async updateByNameEXPI(puntuacion_ig, email){
+    async updateByNameAPAR(puntuacion_ar, email) {
         try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_ext SET puntuacion_idioma = ? WHERE email = ?"
-                connection.query(query, [puntuacion_ig, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
+            const result = await this.query("UPDATE carrera_agro SET puntuacion_agro = ? WHERE email = ?", [puntuacion_ar, email]);
+            return result.affectedRows === 1;
         } catch (error) {
-            console.log(error)
+            console.error(error);
             return false;
-        }finally{
-            connection.close();
         }
     }
 
-    async updateByNameGCPA(puntuacion_at, email){
+    async updateByNameAPCI(puntuacion_ci, email) {
         try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE carrera_gec SET puntuacion_act = ? WHERE email = ?"
-                connection.query(query, [puntuacion_at, email],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
-            //return response;
+            const result = await this.query("UPDATE carrera_agro SET puntuacion_ciencias = ? WHERE email = ?", [puntuacion_ci, email]);
+            return result.affectedRows === 1;
         } catch (error) {
-            console.log(error)
+            console.error(error);
             return false;
-        }finally{
-            connection.close();
         }
     }
-    async updateEstadistica(carrera, estudiantes,graduados,insercion){
+
+    async updateByNameAPIG(puntuacion_ig, email) {
         try {
-            
-            const response = await new Promise((resolve, reject)=>{
-                const query = "UPDATE estadisticas SET estudiantes = ?, graduados = ?, insercion = ? WHERE carrera = ?"
-                connection.query(query, [ estudiantes,graduados,insercion, carrera],(err , result)=>{
-                    if (err) reject(new Error(err.message));
-                    resolve(result.affectedRows);
-                }) 
-            });
-            return response === 1 ? true : false;
+            const result = await this.query("UPDATE carrera_agro SET puntuacion_ingles = ? WHERE email = ?", [puntuacion_ig, email]);
+            return result.affectedRows === 1;
         } catch (error) {
-            console.log(error)
+            console.error(error);
             return false;
-        }finally{
-            connection.close();
+        }
+    }
+
+    async updateByNameAPMT(puntuacion_mt, email) {
+        try {
+            const result = await this.query("UPDATE carrera_agro SET puntuacion_mate = ? WHERE email = ?", [puntuacion_mt, email]);
+            return result.affectedRows === 1;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
+    async updateByNameEXPI(puntuacion_ig, email) {
+        try {
+            const result = await this.query("UPDATE carrera_ext SET puntuacion_idioma = ? WHERE email = ?", [puntuacion_ig, email]);
+            return result.affectedRows === 1;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
+    async updateByNameGCPA(puntuacion_at, email) {
+        try {
+            const result = await this.query("UPDATE carrera_gec SET puntuacion_act = ? WHERE email = ?", [puntuacion_at, email]);
+            return result.affectedRows === 1;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
+    async updateEstadistica(carrera, estudiantes, graduados, insercion) {
+        try {
+            const result = await this.query("UPDATE estadisticas SET estudiantes = ?, graduados = ?, insercion = ? WHERE carrera = ?", [estudiantes, graduados, insercion, carrera]);
+            return result.affectedRows === 1;
+        } catch (error) {
+            console.error(error);
+            return false;
         }
     }
 }
+
+let instance = null;
 
 module.exports = DbService;
