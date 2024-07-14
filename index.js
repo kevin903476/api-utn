@@ -20,6 +20,14 @@ app.post('/insertUser', async (request, response) =>{
     let encriptada = await bcryptjs.hash(contra, 8)
     const result = db.insertUser(nombre,email,encriptada)
 
+    const userExists = await db.validarUser(email);
+    if (userExists.length > 0) {
+        response.status(400).json({ error: 'El correo ya existe' });
+    } else {
+        const result = await db.insertUser(nombre, email, encriptada);
+        response.json({ data: result });
+    }
+
     result
     .then(data => response.json({data : data}))
     .catch(err => console.log(err))
