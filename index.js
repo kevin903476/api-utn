@@ -14,23 +14,23 @@ app.use(express.urlencoded({extended : false}));
 
 //create
 
-app.post('/insertUser', async (request, response) =>{
-    const {nombre, email, contra } = request.body;
+app.post('/insertUser', async (request, response) => {
+    const { nombre, email, contra } = request.body;
     const db = dbService.getDbServiceInstance();
-    let encriptada = await bcryptjs.hash(contra, 8)
-    const result = db.insertUser(nombre,email,encriptada)
 
-    const userExists = await db.validarUser(email);
-    if (userExists.length > 0) {
-        response.status(400).json({ error: 'El correo ya existe' });
-    } else {
-        const result = await db.insertUser(nombre, email, encriptada);
-        response.json({ data: result });
+    try {
+        const userExists = await db.validarUser(email);
+        if (userExists.length > 0) {
+            return response.status(400).json({ error: 'El correo ya existe' });
+        } else {
+            let encriptada = await bcryptjs.hash(contra, 8);
+            const result = await db.insertUser(nombre, email, encriptada);
+            return response.json({ data: result });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        return response.status(500).json({ error: 'Error en el servidor' });
     }
-
-    result
-    .then(data => response.json({data : data}))
-    .catch(err => console.log(err))
 });
 
 app.post('/insert', (request, response) =>{
@@ -104,16 +104,45 @@ app.get('/estadisticas-gec', (request, response) =>{
     .then(data => response.json({data}))
     .catch(err => console.log(err)); 
 });
-app.post('/obtenerUser', (request, response) =>{
-    const { email} = request.body;
+app.post('/obtenerUser', (request, response) => {
+    const { email } = request.body;
     const db = dbService.getDbServiceInstance();
 
     const result = db.obtenerUsuario(email);
     
     result
-    .then(data => response.json({data}))
-    .catch(err => console.log(err)); 
+    .then(data => response.json({ data }))
+    .catch(err => {
+        console.log(err);
+        response.status(500).json({ error: 'Error al obtener usuario' });
+    });
 });
+
+app.post('/obtenerUserPass', async (request, response) => {
+    const { email, contra } = request.body;
+    const db = dbService.getDbServiceInstance();
+    
+    try {
+        const result = await db.obtenerUsuarioPass(email);
+
+        if (result.length > 0) {
+            const user = result[0];
+            const compare = await bcryptjs.compare(contra, user.contra);
+
+            if (compare) {
+                response.json({ email: email, contra: user.contra });  // Devolvemos el correo y la contraseña encriptada
+            } else {
+                response.status(401).json({ error: 'Correo o contraseña incorrectos' });
+            }
+        } else {
+            response.status(404).json({ error: 'Usuario no encontrado' });
+        }
+    } catch (err) {
+        console.error(err);
+        response.status(500).json({ error: 'Error al obtener usuario desde la base de datos' });
+    }
+});
+
 
 app.post('/getUserIti', (request, response) =>{
     const { email} = request.body;
@@ -288,6 +317,32 @@ app.patch('/updateGCPA', (request , response) => {
     .then(data => response.json({sucess : data}))
     .catch(err => console.log(err))
 })
+
+// Endpoint para cambiar la contraseña
+app.patch('/updatePassword', async (request, response) => {
+    const { email, newPassword } = request.body;
+    const db = dbService.getDbServiceInstance();
+
+    try {
+        // Encriptar la nueva contraseña
+        const hashedPassword = await bcryptjs.hash(newPassword, 8);
+
+        // Actualizar la contraseña en la base de datos
+        const result = await db.updatebyPassword(email, hashedPassword);
+
+        if (result) {
+            response.json({ success: true });
+        } else {
+            response.status(500).json({ error: 'No se pudo cambiar la contraseña en la base de datos' });
+        }
+    } catch (error) {
+        console.error('Error al cambiar la contraseña:', error);
+        response.status(500).json({ error: 'Error interno al cambiar la contraseña' });
+    }
+});
+
+
+
 app.patch('/updateEstadisticas', (request , response) => {
     const {carrera, estudiantes,graduados,insercion} =request.body
     const db = dbService.getDbServiceInstance();

@@ -1,5 +1,6 @@
 const mysql = require('mysql2');
 const dotenv = require('dotenv');
+const e = require('cors');
 
 dotenv.config();
 
@@ -115,6 +116,17 @@ class DbService {
             console.error(error);
         }
     }
+
+    async obtenerUsuarioPass(email) {
+        try {
+            const results = await this.query("SELECT contra FROM usuarios WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Error al obtener usuario desde la base de datos');
+        }
+    }
+    
 
     async getUserIti(email) {
         try {
@@ -256,7 +268,15 @@ class DbService {
             return false;
         }
     }
-
+    async updatebyPassword(email, hashedPassword) {
+        try {
+            const result = await this.query("UPDATE usuarios SET contra = ? WHERE email = ?", [hashedPassword, email]);
+            return result.affectedRows === 1;
+        } catch (error) {
+            console.error('Error al actualizar contraseña en la base de datos:', error);
+            return false; 
+        }
+    }
     async updateByNameEXPI(puntuacion_ig, email) {
         try {
             const result = await this.query("UPDATE carrera_ext SET puntuacion_idioma = ? WHERE email = ?", [puntuacion_ig, email]);
