@@ -318,7 +318,7 @@ app.patch('/updateGCPA', (request , response) => {
     .catch(err => console.log(err))
 })
 
-// Endpoint para cambiar la contraseña
+
 app.patch('/updatePassword', async (request, response) => {
     const { email, newPassword } = request.body;
     const db = dbService.getDbServiceInstance();
@@ -340,6 +340,7 @@ app.patch('/updatePassword', async (request, response) => {
         response.status(500).json({ error: 'Error interno al cambiar la contraseña' });
     }
 });
+
 
 
 
