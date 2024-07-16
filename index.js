@@ -327,11 +327,7 @@ app.patch('/updatePassword', async (request, response) => {
     console.log(newPassword);
 
     try {
-        
-        const hashedPassword = await bcryptjs.hash(newPassword, 8);
-
-        onsole.log(hashedPassword);
-        const result = await db.updatebyPassword(email, hashedPassword);
+        const result = await db.updatebyPassword(email, newPassword);
 
         if (result) {
             response.json({ success: true });
@@ -343,6 +339,7 @@ app.patch('/updatePassword', async (request, response) => {
         response.status(500).json({ error: 'Error interno al cambiar la contraseña' });
     }
 });
+
 
 
 
