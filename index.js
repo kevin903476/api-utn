@@ -324,16 +324,12 @@ app.patch('/updatePassword', async (request, response) => {
     const db = dbService.getDbServiceInstance();
 
     try {
-        
-        const hashedPassword = await bcryptjs.hash(newPassword, 8);
-
-        
-        const result = await db.updateByPassword(email, hashedPassword);
+        const result = await db.updateByPassword(email, newPassword);
 
         if (result) {
             response.json({ success: true });
         } else {
-            response.status(500).json({ error: ''});
+            response.status(500).json({ error: 'No se pudo cambiar la contraseña en la base de datos' });
         }
     } catch (error) {
         console.error('Error al cambiar la contraseña:', error);
