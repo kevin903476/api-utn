@@ -324,7 +324,9 @@ app.patch('/updatePassword', async (request, response) => {
     const db = dbService.getDbServiceInstance();
 
     try {
-        const result = await db.updateByPassword(email, newPassword);
+        const hashedPassword = await bcryptjs.hash(newPassword, 8); // Encriptar la contraseña
+
+        const result = await db.updateByPassword(email, hashedPassword);
 
         if (result) {
             response.json({ success: true });

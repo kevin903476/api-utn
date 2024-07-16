@@ -268,9 +268,9 @@ class DbService {
             return false;
         }
     }
-    async updateByPassword(email, newPassword) {
+    async updateByPassword(email, hashedPassword) {
         try {
-            const result = await this.query("UPDATE usuarios SET contra = ? WHERE email = ?", [newPassword, email]);
+            const result = await this.query("UPDATE usuarios SET contra = ? WHERE email = ?", [hashedPassword, email]);
             return result.affectedRows === 1;
         } catch (error) {
             console.error('Error al actualizar contraseña en la base de datos:', error);
