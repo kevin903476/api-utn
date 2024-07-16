@@ -333,7 +333,7 @@ app.patch('/updatePassword', async (request, response) => {
         if (result) {
             response.json({ success: true });
         } else {
-            response.status(500).json({ error: });
+            response.status(500).json({ error: ''});
         }
     } catch (error) {
         console.error('Error al cambiar la contraseña:', error);
