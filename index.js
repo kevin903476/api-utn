@@ -327,7 +327,7 @@ app.patch('/updatePassword', async (request, response) => {
     console.log(newPassword);
 
     try {
-        const result = await db.updatebyPassword(email, newPassword);
+        const result = await db.updateByPassword(email, newPassword);
 
         if (result) {
             response.json({ success: true });
