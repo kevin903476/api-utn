@@ -4,6 +4,12 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const bcryptjs = require('bcryptjs');
 
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+
+
+
+
 dotenv.config();
 
 const dbService = require('./dbService')
@@ -12,7 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended : false}));
 
-//create
+app.use(bodyParser.json());
 
 app.post('/insertUser', async (request, response) => {
     const { nombre, email, contra } = request.body;
@@ -203,6 +209,9 @@ app.post('/validarUser', async (request, response) => {
         response.json({ data: false });
     }
 });
+
+
+
 
 //update
 app.patch('/updatePLG', (request , response) => {
