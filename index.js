@@ -21,6 +21,7 @@ app.use(express.urlencoded({extended : false}));
 app.use(bodyParser.json());
 
 
+
 app.post('/send-email', async (req, res) => {
     const { email } = req.body;
   
@@ -60,6 +61,7 @@ app.post('/send-email', async (req, res) => {
       res.status(500).json({ error: 'Error al obtener los datos del usuario' });
     }
   });
+
 
 app.post('/insertUser', async (request, response) => {
     const { nombre, email, contra } = request.body;
