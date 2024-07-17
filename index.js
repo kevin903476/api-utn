@@ -4,6 +4,12 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const bcryptjs = require('bcryptjs');
 
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+
+
+
+
 dotenv.config();
 
 const dbService = require('./dbService')
@@ -12,7 +18,48 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended : false}));
 
-//create
+app.use(bodyParser.json());
+
+
+app.post('/send-email', async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const results = await userQueries.getPromedioByEmail(email);
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Usuario no encontrado' });
+      }
+  
+      const user = results[0];
+  
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'utnestudiantes8@gmail.com',
+          pass: 'Estudiantes123*'
+        }
+      });
+  
+      const mailOptions = {
+        from: 'utnestudiantes8@gmail.com',
+        to: email,
+        subject: 'Resultados del Test',
+        text: ` tu promedio es de: ${user.promedio}`
+      };
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error('Error al enviar el correo:', error);
+          return res.status(500).json({ error: 'Error al enviar el correo' });
+        }
+        console.log('Correo enviado:', info.response);
+        res.status(200).json({ message: 'Correo enviado exitosamente' });
+      });
+    } catch (error) {
+      console.error('Error al obtener los datos del usuario:', error);
+      res.status(500).json({ error: 'Error al obtener los datos del usuario' });
+    }
+  });
 
 app.post('/insertUser', async (request, response) => {
     const { nombre, email, contra } = request.body;
@@ -203,6 +250,9 @@ app.post('/validarUser', async (request, response) => {
         response.json({ data: false });
     }
 });
+
+
+
 
 //update
 app.patch('/updatePLG', (request , response) => {
