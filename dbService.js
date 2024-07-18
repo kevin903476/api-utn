@@ -61,25 +61,22 @@ class DbService {
         } catch (error) {
             console.error(error);
         }
+    }    
+      async getUserByEmail(email) {
+        try {
+            const results = await this.query("SELECT email FROM usuarios WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
     }
-    async getUserByEmail(email, callback) {
-        const query = 'SELECT email FROM usuarios WHERE email = ?';
-        pool.query(query, [email], (err, results) => {
-          if (err) {
-            return callback(err, null);
-          }
-          callback(null, results);
-        });
-      }
-      
-        async getPromedioByEmail(email, callback) {
-        const query = 'SELECT * FROM promedio WHERE email = ?';
-        pool.query(query, [email], (err, results) => {
-          if (err) {
-            return callback(err, null);
-          }
-          callback(null, results);
-        });
+      async getPromedioByEmail(email){
+        try{
+            const results = await this.query("SELECT * FROM promedios WHERE email = ?", [email]);
+            return results;
+        }catch (error){
+            console.error(error);
+        }
       }
     async EstadisticaEstudianteITI() {
         try {

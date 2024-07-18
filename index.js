@@ -22,46 +22,43 @@ app.use(bodyParser.json());
 
 
 
-app.post('/send-email', async (req, res) => {
-    const { email } = req.body;
+app.post('/send-email', async (request, response) => {
+    const { email } = request.body;
+    const db=dbService.getDbServiceInstance();
   
     try {
-      const results = await userQueries.getPromedioByEmail(email);
-      if (results.length === 0) {
-        return res.status(404).json({ error: 'Usuario no encontrado' });
-      }
-  
-      const user = results[0];
+      const userResults = await db.getUserByEmail(email);
+      console.log(userResults);
+   
+      const promedioResults = await db.getPromedioByEmail(email);
+      console.log(promedioResults);
+     
   
       const transporter = nodemailer.createTransport({
         service: 'gmail',
+        host:'utnestudiantes8@gmail.com',
+        port:465,
+        secure:true,
         auth: {
           user: 'utnestudiantes8@gmail.com',
           pass: 'Estudiantes123*'
         }
       });
-  
-      const mailOptions = {
-        from: 'utnestudiantes8@gmail.com',
-        to: email,
+      const info= await transporter.sendMail({
+        from:'utnestudiantes8@gmail.com',
+        to: {email},
         subject: 'Resultados del Test',
-        text: ` tu promedio es de: ${user.promedio}`
-      };
+        text: 'Tu promedio es de:'+ promedioResults
+
+      })
+     console.log("Mensaje enviado:"+info.messageId);
   
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error('Error al enviar el correo:', error);
-          return res.status(500).json({ error: 'Error al enviar el correo' });
-        }
-        console.log('Correo enviado:', info.response);
-        res.status(200).json({ message: 'Correo enviado exitosamente' });
-      });
+     
     } catch (error) {
       console.error('Error al obtener los datos del usuario:', error);
-      res.status(500).json({ error: 'Error al obtener los datos del usuario' });
+     
     }
   });
-
 
 app.post('/insertUser', async (request, response) => {
     const { nombre, email, contra } = request.body;
