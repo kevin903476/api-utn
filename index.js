@@ -24,41 +24,43 @@ app.use(bodyParser.json());
 
 app.post('/send-email', async (request, response) => {
     const { email } = request.body;
-    const db=dbService.getDbServiceInstance();
-  
-    try {
-      const userResults = await db.getUserByEmail(email);
-      console.log(userResults);
-   
-      const promedioResults = await db.getPromedioByEmail(email);
-      console.log(promedioResults);
-     
-  
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host:'utnestudiantes8@gmail.com',
-        port:465,
-        secure:true,
-        auth: {
-          user: 'utnestudiantes8@gmail.com',
-          pass: 'Estudiantes123*'
-        }
-      });
-      const info= await transporter.sendMail({
-        from:'utnestudiantes8@gmail.com',
-        to: {email},
-        subject: 'Resultados del Test',
-        text: 'Tu promedio es de:'+ promedioResults
+    const db = dbService.getDbServiceInstance();
 
-      })
-     console.log("Mensaje enviado:"+info.messageId);
-  
-     
+    try {
+        const userResults = await db.getUserByEmail(email);
+        console.log(userResults);
+
+        const promedioResults = await db.getPromedioByEmail(email);
+        if (promedioResults.length > 0) {
+            const promedio = promedioResults[0].promedio;  // Ajustar según el nombre del campo en tu base de datos
+            console.log(promedio);
+
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'utnestudiantes8@gmail.com',
+                    pass: 'Estudiantes123*'
+                }
+            });
+
+            const info = await transporter.sendMail({
+                from: 'utnestudiantes8@gmail.com',
+                to: email,
+                subject: 'Resultados del Test',
+                text: 'Tu promedio es de: ' + promedio
+            });
+
+            console.log("Mensaje enviado: " + info.messageId);
+            response.status(200).send("Correo enviado exitosamente");
+        } else {
+            console.error('No se encontró el promedio para el usuario.');
+            response.status(404).send('No se encontró el promedio para el usuario.');
+        }
     } catch (error) {
-      console.error('Error al obtener los datos del usuario:', error);
-     
+        console.error('Error al obtener los datos del usuario o enviar el correo:', error);
+        response.status(500).send('Error al enviar el correo');
     }
-  });
+});
 
 app.post('/insertUser', async (request, response) => {
     const { nombre, email, contra } = request.body;
