@@ -20,7 +20,7 @@ app.use(express.urlencoded({extended : false}));
 
 app.use(bodyParser.json());
 
-async function sendEmail(email){
+async function sendEmail(email, message){
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -34,9 +34,9 @@ async function sendEmail(email){
         const info = await transporter.sendMail({
             from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
             to: email, // list of receivers
-            subject: "Hello ✔", // Subject line
-            text: "Hello world?", // plain text body
-            html: "<b>Hello world?</b>", // html body
+            subject: "Promedio de Ejercicios", // Subject line
+            
+            html: message, // html body
         });
         console.log("Mesaje enviado: " + info.messageId)
     } catch (error) {
@@ -45,14 +45,54 @@ async function sendEmail(email){
     }
 
 }
+function htmlMessage(promedio, carrera){
+    let htmlContent = `
+    
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Promedio de Ejercicios</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+            .container { background-color: #fff; margin: 50px auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 600px; text-align: center; }
+            .title { color: #333; font-size: 24px; margin-bottom: 10px; }
+            .subtitle { color: #555; font-size: 18px; margin-bottom: 20px; }
+            .average { font-size: 36px; color: #ff6f61; font-weight: bold; margin-bottom: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="title">¡Gracias por completar nuestros ejercicios!</h1>
+            <h2 class="subtitle">A continuación, te presentamos el promedio de tus ejercicios en la carrera de ${carrera}:</h2>
+            <div class="average"> ${promedio}</div>
+        </div>
+    </body>
+    </html>
+    
+    `;
 
-app.post('/send-email', async (request, response) => {
+    return htmlContent;
+
+
+}
+
+app.post('/send-email-iti', async (request, response) => {
     const { email } = request.body;
+    const db = dbService.getDbServiceInstance();
+    
+    const result = await db.validarUser(email, 'TECNOLOGÍAS DE INFORMACIÓN');
     console.log(email)
-
     try {
-        sendEmail(email);
-        response.status(200).json({ message: 'Email enviado exitosamente' });
+        if (result.length > 0) {
+            const promedio = result[0];
+            
+            let htmlContent = htmlMessage(promedio.promedio, promedio.carrera)
+
+            sendEmail(email,htmlContent);
+            response.status(200).json({ message: 'Email enviado exitosamente' });
+        }
+        
+        
     } catch (error) {
         console.log(error)
         response.status(500).json({ error: 'Error al enviar el email' });
