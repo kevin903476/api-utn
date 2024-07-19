@@ -11,7 +11,7 @@ const pool = mysql.createPool({
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
     port: process.env.DB_PORT,
-    connectionLimit: 20, // Ajusta este valor según tus necesidades
+    connectionLimit: 20, // El valor de las conexiones
     queueLimit: 0, // No limitar el número de solicitudes en espera
     acquireTimeout: 10000 // Tiempo de espera para obtener una conexión (en milisegundos)
 });
@@ -70,9 +70,9 @@ class DbService {
             console.error(error);
         }
     }
-      async getPromedioByEmail(email){
+      async getPromedioByEmail(email, carrera){
         try{
-            const results = await this.query("SELECT * FROM promedios WHERE email = ?", [email]);
+            const results = await this.query("SELECT * FROM promedios WHERE email = ? AND carrera = ?", [email]);
             return results;
         }catch (error){
             console.error(error);
