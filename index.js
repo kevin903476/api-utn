@@ -27,38 +27,40 @@ app.post('/send-email', async (request, response) => {
     const db = dbService.getDbServiceInstance();
 
     try {
-        const userResults = await db.getUserByEmail(email);
-        console.log(userResults);
+         // Verificar si el usuario existe
+      const email = await db.getUserByEmail(email);
+      if (userResults.length === 0) {
+        return response.status(404).json({ error: 'Usuario no encontrado' });
+      }
+  
+      // Obtener el promedio del usuario
+      const promedioResults = await db.getPromedioByEmail(email);
+      if (promedioResults.length === 0) {
+        return response.status(404).json({ error: 'Promedio no encontrado para el usuario' });
+      }
 
-        const promedioResults = await db.getPromedioByEmail(email);
-        if (promedioResults.length > 0) {
-            const promedio = promedioResults[0].promedio;  // Ajustar según el nombre del campo en tu base de datos
-            console.log(promedio);
-
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: 'utnestudiantes8@gmail.com',
-                    pass: 'Estudiantes123*'
-                }
-            });
-
-            const info = await transporter.sendMail({
-                from: 'utnestudiantes8@gmail.com',
-                to: email,
-                subject: 'Resultados del Test',
-                text: 'Tu promedio es de: ' + promedio
-            });
-
-            console.log("Mensaje enviado: " + info.messageId);
-            response.status(200).send("Correo enviado exitosamente");
-        } else {
-            console.error('No se encontró el promedio para el usuario.');
-            response.status(404).send('No se encontró el promedio para el usuario.');
-        }
+        const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true, 
+            auth: {
+              user: "utnestudiantes8@gmail.com",
+              pass: "kddeucuzewldghry",
+            },
+        });
+        transporter.verify().then(() =>{
+            console.log('listo para enviar emails');
+            
+        });
+        await transporter.sendMail({
+            from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
+            to: email, // list of receivers
+            subject: "Hello ✔", // Subject line
+            text: "Hello world?", // plain text body
+            html: "<b>Hello world?</b>", // html body
+        });
     } catch (error) {
-        console.error('Error al obtener los datos del usuario o enviar el correo:', error);
-        response.status(500).send('Error al enviar el correo');
+        console.error(error);
     }
 });
 
