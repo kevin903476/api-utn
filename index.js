@@ -87,6 +87,47 @@ function htmlMessage(promedio, carrera){
 
 }
 
+function htmlMessageGEC(promedio, carrera){
+    let mensaje = '';
+    if (promedio >= 45 && promedio <= 54) {
+        mensaje = "Tienes una gran aptitud para estudiar Bachillerato en Gestión Ecoturística. Posees las características, habilidades, intereses y experiencia necesarias para tener éxito en esta carrera. Tienes una clara comprensión de lo que implica el ecoturismo y estás motivado para trabajar en un campo que tenga un impacto positivo en el mundo.";
+    } else if (promedio >= 36 && promedio <=44) {
+        mensaje = "Tienes algunas aptitudes para estudiar Bachillerato en Gestión Ecoturística. Posees algunas de las características, habilidades e intereses necesarios para tener éxito en esta carrera. Sin embargo, es posible que necesites desarrollar algunas habilidades adicionales o adquirir más experiencia antes de estar listo para comenzar tus estudios.";
+    } else if(promedio>=1 && promedio <=35){
+        mensaje = "Es posible que estudiar Bachillerato en Gestión Ecoturística no sea la mejor opción para ti. No tienes algunas de las características, habilidades o intereses más importantes para tener éxito en esta carrera. Es importante que explores otras opciones de carrera que se ajusten mejor a tus intereses y habilidades.";
+    }
+
+    let htmlContent = `
+    
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Promedio de Ejercicios</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+            .container { background-color: #fff; margin: 50px auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 600px; text-align: center; }
+            .title { color: #333; font-size: 24px; margin-bottom: 10px; }
+            .subtitle { color: #555; font-size: 18px; margin-bottom: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="title">¡Gracias por completar nuestro ejercicio!</h1>
+            <h2 class="subtitle">A continuación, te presentamos la retroalimentación de tu ejercicio en la carrera de:</h2>
+            <br>
+            <h2 class="subtitle">${carrera}:</h2>
+            <p>${mensaje}</p>
+        </div>
+    </body>
+    </html>
+    
+    `;
+
+    return htmlContent;
+
+
+}
+
 app.post('/send-email-iti', async (request, response) => {
     const { email } = request.body;
     const db = dbService.getDbServiceInstance();
@@ -152,6 +193,77 @@ app.post('/send-email-iti', async (request, response) => {
     } */
 });
 
+app.post('/send-email-agro', async (request, response) => {
+    const { email } = request.body;
+    const db = dbService.getDbServiceInstance();
+    
+    const result = await db.getPromedioByEmail(email, 'AGRONOMÍA');
+    console.log(email)
+    try {
+        if (result.length > 0) {
+            const promedio = result[0];
+            
+            let htmlContent = htmlMessage(promedio.promedio, promedio.carrera)
+
+            sendEmail(email,htmlContent);
+            response.status(200).json({ message: 'Email enviado exitosamente' });
+        }
+        
+        
+    } catch (error) {
+        console.log(error)
+        response.status(500).json({ error: 'Error al enviar el email' });
+    }
+});
+
+
+app.post('/send-email-gec', async (request, response) => {
+    const { email } = request.body;
+    const db = dbService.getDbServiceInstance();
+    
+    const result = await db.getPromedioByEmail(email, 'GESTIÓN ECOTURÍSTICA');
+    console.log(email)
+    try {
+        if (result.length > 0) {
+            const promedio = result[0];
+            
+            let htmlContent = htmlMessageGEC(promedio.promedio, promedio.carrera)
+
+            sendEmail(email,htmlContent);
+            response.status(200).json({ message: 'Email enviado exitosamente' });
+        }
+        
+        
+    } catch (error) {
+        console.log(error)
+        response.status(500).json({ error: 'Error al enviar el email' });
+    }
+});
+
+
+app.post('/send-email-ig', async (request, response) => {
+    const { email } = request.body;
+    const db = dbService.getDbServiceInstance();
+    
+    const result = await db.getPromedioByEmail(email, 'INGLÉS');
+    console.log(email)
+    try {
+        if (result.length > 0) {
+            const promedio = result[0];
+            
+            let htmlContent = htmlMessage(promedio.promedio, promedio.carrera)
+
+            sendEmail(email,htmlContent);
+            response.status(200).json({ message: 'Email enviado exitosamente' });
+        }
+        
+        
+    } catch (error) {
+        console.log(error)
+        response.status(500).json({ error: 'Error al enviar el email' });
+    }
+});
+
 app.post('/insertUser', async (request, response) => {
     const { nombre, email, contra } = request.body;
     const db = dbService.getDbServiceInstance();
@@ -170,6 +282,8 @@ app.post('/insertUser', async (request, response) => {
         return response.status(500).json({ error: 'Error en el servidor' });
     }
 });
+
+
 
 app.post('/insert', (request, response) =>{
     const {nombre } = request.body;
