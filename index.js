@@ -24,6 +24,30 @@ app.use(bodyParser.json());
 
 app.post('/send-email', async (request, response) => {
     const { email } = request.body;
+    console.log(email)
+        const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true, 
+            auth: {
+              user: "utnestudiantes8@gmail.com",
+              pass: "kddeucuzewldghry",
+            },
+        });
+        transporter.verify().then(() =>{
+            console.log('listo para enviar emails');
+            
+        });
+        await transporter.sendMail({
+            from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
+            to: email, // list of receivers
+            subject: "Hello ✔", // Subject line
+            text: "Hello world?", // plain text body
+            html: "<b>Hello world?</b>", // html body
+        });
+   
+
+    /* const { email } = request.body;
     const db = dbService.getDbServiceInstance();
 
     try {
@@ -61,7 +85,7 @@ app.post('/send-email', async (request, response) => {
         });
     } catch (error) {
         console.error(error);
-    }
+    } */
 });
 
 app.post('/insertUser', async (request, response) => {
