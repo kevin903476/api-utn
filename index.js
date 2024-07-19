@@ -30,15 +30,20 @@ async function sendEmail(email){
           pass: "kddeucuzewldghry",
         },
     });
-    
-    const info = await transporter.sendMail({
-        from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
-        to: email, // list of receivers
-        subject: "Hello ✔", // Subject line
-        text: "Hello world?", // plain text body
-        html: "<b>Hello world?</b>", // html body
-    });
-    console.log("Mesaje enviado: " + info.messageId)
+    try {
+        const info = await transporter.sendMail({
+            from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
+            to: email, // list of receivers
+            subject: "Hello ✔", // Subject line
+            text: "Hello world?", // plain text body
+            html: "<b>Hello world?</b>", // html body
+        });
+        console.log("Mesaje enviado: " + info.messageId)
+    } catch (error) {
+        console.log(error)
+        throw error;
+    }
+
 }
 
 app.post('/send-email', async (request, response) => {
