@@ -49,7 +49,7 @@ function htmlMessage(promedio, carrera){
     let color = '';
     if (promedio <= 3) {
         color = '#ff6961';
-    } else if(promedio >= 4 || promedio <=7){
+    } else if(promedio >= 4 && promedio <=7){
         color = '#84b6f4';
     } else if(promedio >= 8){
         color = '#77dd77';
