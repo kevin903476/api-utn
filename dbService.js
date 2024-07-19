@@ -72,7 +72,7 @@ class DbService {
     }
       async getPromedioByEmail(email, carrera){
         try{
-            const results = await this.query("SELECT * FROM promedios WHERE email = ? AND carrera = ?", [email]);
+            const results = await this.query("SELECT * FROM promedios WHERE email = ? AND carrera = ?", [email, carrera]);
             return results;
         }catch (error){
             console.error(error);

@@ -80,7 +80,7 @@ app.post('/send-email-iti', async (request, response) => {
     const { email } = request.body;
     const db = dbService.getDbServiceInstance();
     
-    const result = await db.validarUser(email, 'TECNOLOGÍAS DE INFORMACIÓN');
+    const result = await db.getPromedioByEmail(email, 'TECNOLOGÍAS DE INFORMACIÓN');
     console.log(email)
     try {
         if (result.length > 0) {
