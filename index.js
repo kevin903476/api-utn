@@ -46,6 +46,15 @@ async function sendEmail(email, message){
 
 }
 function htmlMessage(promedio, carrera){
+    let color = '';
+    if (promedio <= 3) {
+        color = '#ff6961';
+    } else if(promedio => 4 || promedio <=7){
+        color = '#84b6f4';
+    } else if(promedio >= 8){
+        color = '#77dd77';
+    }
+
     let htmlContent = `
     
     <html lang="es">
@@ -57,13 +66,13 @@ function htmlMessage(promedio, carrera){
             .container { background-color: #fff; margin: 50px auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 600px; text-align: center; }
             .title { color: #333; font-size: 24px; margin-bottom: 10px; }
             .subtitle { color: #555; font-size: 18px; margin-bottom: 20px; }
-            .average { font-size: 36px; color: #ff6f61; font-weight: bold; margin-bottom: 20px; }
+            .average { font-size: 36px; color: ${color}; font-weight: bold; margin-bottom: 20px; }
         </style>
     </head>
     <body>
         <div class="container">
             <h1 class="title">¡Gracias por completar nuestros ejercicios!</h1>
-            <h2 class="subtitle">A continuación, te presentamos el promedio de tus ejercicios en la carrera de ${carrera}:</h2>
+            <h2 class="subtitle">A continuación, te presentamos el promedio de tus ejercicios en la carrera de <br> ${carrera}:</h2>
             <div class="average"> ${promedio}</div>
         </div>
     </body>
