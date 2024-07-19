@@ -47,8 +47,10 @@ app.post('/send-email', async (request, response) => {
 
     try {
         sendEmail(email);
+        response.status(200).json({ message: 'Email enviado exitosamente' });
     } catch (error) {
         console.log(error)
+        response.status(500).json({ error: 'Error al enviar el email' });
     }
    
    
