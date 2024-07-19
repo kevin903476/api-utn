@@ -45,7 +45,12 @@ app.post('/send-email', async (request, response) => {
     const { email } = request.body;
     console.log(email)
 
-    sendEmail(email).catch(e => {return e});
+    try {
+        sendEmail(email);
+    } catch (error) {
+        console.log(error)
+    }
+   
    
 
     /* const { email } = request.body;
