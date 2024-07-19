@@ -20,31 +20,32 @@ app.use(express.urlencoded({extended : false}));
 
 app.use(bodyParser.json());
 
-
+async function sendEmail(email){
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true, 
+        auth: {
+          user: "utnestudiantes8@gmail.com",
+          pass: "kddeucuzewldghry",
+        },
+    });
+    
+    const info = await transporter.sendMail({
+        from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
+        to: email, // list of receivers
+        subject: "Hello ✔", // Subject line
+        text: "Hello world?", // plain text body
+        html: "<b>Hello world?</b>", // html body
+    });
+    console.log("Mesaje enviado: " + info.messageId)
+}
 
 app.post('/send-email', async (request, response) => {
     const { email } = request.body;
     console.log(email)
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true, 
-            auth: {
-              user: "utnestudiantes8@gmail.com",
-              pass: "kddeucuzewldghry",
-            },
-        });
-        transporter.verify().then(() =>{
-            console.log('listo para enviar emails');
-            
-        });
-        await transporter.sendMail({
-            from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
-            to: email, // list of receivers
-            subject: "Hello ✔", // Subject line
-            text: "Hello world?", // plain text body
-            html: "<b>Hello world?</b>", // html body
-        });
+
+    sendEmail(email).catch(e => {return e});
    
 
     /* const { email } = request.body;
