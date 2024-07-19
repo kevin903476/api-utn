@@ -49,7 +49,7 @@ function htmlMessage(promedio, carrera){
     let color = '';
     if (promedio <= 3) {
         color = '#ff6961';
-    } else if(promedio => 4 || promedio <=7){
+    } else if(promedio >= 4 || promedio <=7){
         color = '#84b6f4';
     } else if(promedio >= 8){
         color = '#77dd77';
@@ -72,7 +72,9 @@ function htmlMessage(promedio, carrera){
     <body>
         <div class="container">
             <h1 class="title">¡Gracias por completar nuestros ejercicios!</h1>
-            <h2 class="subtitle">A continuación, te presentamos el promedio de tus ejercicios en la carrera de <br> ${carrera}:</h2>
+            <h2 class="subtitle">A continuación, te presentamos el promedio de tus ejercicios en la carrera de:</h2>
+            <br>
+            <h2 class="subtitle">${carrera}:</h2>
             <div class="average"> ${promedio}</div>
         </div>
     </body>
