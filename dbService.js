@@ -323,7 +323,7 @@ class DbService {
     }
     async updateUserRole(email, rol){
         try{
-            const result= await this.query("UPDATE usuarios SET rol = ? WHERE email = ?",[email, rol]);
+            const result= await this.query("UPDATE usuarios SET rol = ? WHERE email = ?",[ rol , email]);
             return result.affectedRows===1;
         }catch(error){
             console.error(error);
