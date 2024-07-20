@@ -7,11 +7,7 @@ const bcryptjs = require('bcryptjs');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 
-
-
-
 dotenv.config();
-
 const dbService = require('./dbService')
 
 app.use(cors());
@@ -19,6 +15,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended : false}));
 
 app.use(bodyParser.json());
+
+
+
 
 async function sendEmail(email, message){
     const transporter = nodemailer.createTransport({
@@ -456,7 +455,15 @@ app.post('/validarUser', async (request, response) => {
     }
 });
 
+app.post('/update-role', async (request, response) => {
+    const { email, role } = req.body;
+    const db = DbService.getDbServiceInstance();
+    const result= db.updateUserRole(email, role);
 
+    result 
+    .then(data=>response.json({succes : data}))
+    .catch(err=>console.log(err))
+  });
 
 
 //update
