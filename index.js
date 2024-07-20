@@ -456,7 +456,7 @@ app.post('/validarUser', async (request, response) => {
 });
 
 app.patch('/update-role', async (request, response) => {
-    const { email, rol } = req.body;
+    const { email, rol } = request.body;
     const db = DbService.getDbServiceInstance();
     const result= db.updateUserRole(email, rol);
 
