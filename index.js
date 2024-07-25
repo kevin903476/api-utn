@@ -47,11 +47,11 @@ async function sendEmail(email, message){
 }
 function htmlMessage(promedio, carrera){
     let color = '';
-    if (promedio <= 3) {
+    if (promedio <= 30) {
         color = '#ff6961';
-    } else if(promedio >= 4 && promedio <=7){
+    } else if(promedio >= 40 && promedio <=70){
         color = '#84b6f4';
-    } else if(promedio >= 8){
+    } else if(promedio >= 80){
         color = '#77dd77';
     }
 
@@ -75,7 +75,7 @@ function htmlMessage(promedio, carrera){
             <h2 class="subtitle">A continuación, te presentamos el promedio de tus ejercicios en la carrera de:</h2>
             <br>
             <h2 class="subtitle">${carrera}:</h2>
-            <div class="average"> ${promedio}</div>
+            <div class="average"> ${promedio} / 100</div>
         </div>
     </body>
     </html>
@@ -116,6 +116,7 @@ function htmlMessageGEC(promedio, carrera){
             <h2 class="subtitle">A continuación, te presentamos la retroalimentación de tu ejercicio en la carrera de:</h2>
             <br>
             <h2 class="subtitle">${carrera}:</h2>
+            <div class="average"> ${promedio} / 100</div>
             <p>${mensaje}</p>
         </div>
     </body>
