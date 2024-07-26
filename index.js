@@ -89,14 +89,22 @@ function htmlMessage(promedio, carrera){
 
 function htmlMessageGEC(promedio, carrera){
     let mensaje = '';
-    if (promedio >= 45 && promedio <= 54) {
+    if (promedio >= 80 && promedio <=100) {
         mensaje = "Tienes una gran aptitud para estudiar Bachillerato en Gestión Ecoturística. Posees las características, habilidades, intereses y experiencia necesarias para tener éxito en esta carrera. Tienes una clara comprensión de lo que implica el ecoturismo y estás motivado para trabajar en un campo que tenga un impacto positivo en el mundo.";
-    } else if (promedio >= 36 && promedio <=44) {
+    } else if (promedio >= 60 && promedio <=79) {
         mensaje = "Tienes algunas aptitudes para estudiar Bachillerato en Gestión Ecoturística. Posees algunas de las características, habilidades e intereses necesarios para tener éxito en esta carrera. Sin embargo, es posible que necesites desarrollar algunas habilidades adicionales o adquirir más experiencia antes de estar listo para comenzar tus estudios.";
-    } else if(promedio>=1 && promedio <=35){
+    } else if(promedio>=1 && promedio <=59){
         mensaje = "Es posible que estudiar Bachillerato en Gestión Ecoturística no sea la mejor opción para ti. No tienes algunas de las características, habilidades o intereses más importantes para tener éxito en esta carrera. Es importante que explores otras opciones de carrera que se ajusten mejor a tus intereses y habilidades.";
     }
 
+    let color = '';
+    if (promedio <= 30) {
+        color = '#ff6961';
+    } else if(promedio >= 40 && promedio <=70){
+        color = '#84b6f4';
+    } else if(promedio >= 80){
+        color = '#77dd77';
+    }
     let htmlContent = `
     
     <html lang="es">
@@ -108,6 +116,7 @@ function htmlMessageGEC(promedio, carrera){
             .container { background-color: #fff; margin: 50px auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 600px; text-align: center; }
             .title { color: #333; font-size: 24px; margin-bottom: 10px; }
             .subtitle { color: #555; font-size: 18px; margin-bottom: 20px; }
+            .average { font-size: 36px; color: ${color}; font-weight: bold; margin-bottom: 20px; }
         </style>
     </head>
     <body>
@@ -116,7 +125,7 @@ function htmlMessageGEC(promedio, carrera){
             <h2 class="subtitle">A continuación, te presentamos la retroalimentación de tu ejercicio en la carrera de:</h2>
             <br>
             <h2 class="subtitle">${carrera}:</h2>
-            <div class="average">${promedio}</div>
+            <div class="average"><p>${promedio}/100</p></div>
             <p>${mensaje}</p>
         </div>
     </body>
