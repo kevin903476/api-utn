@@ -7,11 +7,7 @@ const bcryptjs = require('bcryptjs');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 
-
-
-
 dotenv.config();
-
 const dbService = require('./dbService')
 
 app.use(cors());
@@ -513,7 +509,15 @@ app.post('/validarUser', async (request, response) => {
     }
 });
 
+app.patch('/update-role', async (request, response) => {
+    const { email, rol } = request.body;
+    const db = dbService.getDbServiceInstance();
+    const result= db.updateUserRole(email, rol);
 
+    result 
+    .then(data=>response.json({succes : data}))
+    .catch(err=>console.log(err))
+  });
 
 
 //update
