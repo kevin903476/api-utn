@@ -20,7 +20,7 @@ app.use(express.urlencoded({extended : false}));
 
 app.use(bodyParser.json());
 
-async function sendEmail(email, message){
+async function sendEmail(email, message, sub){
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -34,7 +34,7 @@ async function sendEmail(email, message){
         const info = await transporter.sendMail({
             from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
             to: email, // list of receivers
-            subject: "Promedio de Ejercicios", // Subject line
+            subject: sub, // Subject line
             
             html: message, // html body
         });
@@ -76,6 +76,39 @@ function htmlMessage(promedio, carrera){
             <br>
             <h2 class="subtitle">${carrera}:</h2>
             <div class="average"><p>${promedio}/100</p></div> 
+        </div>
+    </body>
+    </html>
+    
+    `;
+
+    return htmlContent;
+
+
+}
+
+function codeMessage(codigo){
+
+    let htmlContent = `
+    
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Promedio de Ejercicios</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+            .container { background-color: #fff; margin: 50px auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 600px; text-align: center; }
+            .title { color: #333; font-size: 24px; margin-bottom: 10px; }
+            .subtitle { color: #555; font-size: 18px; margin-bottom: 20px; }
+            .average { font-size: 36px; color: #77dd77; font-weight: bold; margin-bottom: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="title">¡Bienvenido a la Herramienta de Ejercicios UTN!</h1>
+            <h2 class="subtitle">Nos complace que hayas decidido unirte a nosotros. Para comenzar a utilizar nuestra plataforma y acceder a todos los ejercicios que ofrecemos, por favor verifica tu correo electrónico ingresando el siguiente código de verificación:</h2>
+            <br>
+            <div class="average"><p>${codigo}</p></div> 
         </div>
     </body>
     </html>
@@ -150,7 +183,7 @@ app.post('/send-email-iti', async (request, response) => {
             
             let htmlContent = htmlMessage(promedio.promedio, promedio.carrera)
 
-            sendEmail(email,htmlContent);
+            sendEmail(email,htmlContent, "Promedio de Ejercicios");
             response.status(200).json({ message: 'Email enviado exitosamente' });
         }
         
@@ -215,7 +248,7 @@ app.post('/send-email-agro', async (request, response) => {
             
             let htmlContent = htmlMessage(promedio.promedio, promedio.carrera)
 
-            sendEmail(email,htmlContent);
+            sendEmail(email,htmlContent, "Promedio de Ejercicios");
             response.status(200).json({ message: 'Email enviado exitosamente' });
         }
         
@@ -239,7 +272,7 @@ app.post('/send-email-gec', async (request, response) => {
             
             let htmlContent = htmlMessageGEC(promedio.promedio, promedio.carrera)
 
-            sendEmail(email,htmlContent);
+            sendEmail(email,htmlContent, "Promedio de Ejercicios");
             response.status(200).json({ message: 'Email enviado exitosamente' });
         }
         
@@ -263,11 +296,25 @@ app.post('/send-email-ig', async (request, response) => {
             
             let htmlContent = htmlMessage(promedio.promedio, promedio.carrera)
 
-            sendEmail(email,htmlContent);
+            sendEmail(email,htmlContent, "Promedio de Ejercicios");
             response.status(200).json({ message: 'Email enviado exitosamente' });
         }
         
         
+    } catch (error) {
+        console.log(error)
+        response.status(500).json({ error: 'Error al enviar el email' });
+    }
+});
+ 
+app.post('/send-email-code', async (request, response) => {
+    const { email,codigo } = request.body;
+    const db = dbService.getDbServiceInstance();
+    
+    try {
+        let htmlContent = codeMessage(codigo)
+        sendEmail(email,htmlContent, "Código de Verificación");
+        response.status(200).json({ message: 'Email enviado exitosamente' });
     } catch (error) {
         console.log(error)
         response.status(500).json({ error: 'Error al enviar el email' });
