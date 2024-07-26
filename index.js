@@ -16,7 +16,6 @@ app.use(express.urlencoded({extended : false}));
 
 app.use(bodyParser.json());
 
-
 async function sendEmail(email, message, sub){
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
