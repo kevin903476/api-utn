@@ -75,7 +75,7 @@ function htmlMessage(promedio, carrera){
             <h2 class="subtitle">A continuación, te presentamos el promedio de tus ejercicios en la carrera de:</h2>
             <br>
             <h2 class="subtitle">${carrera}:</h2>
-            <div class="average"> ${promedio} / 100</div>
+            <div class="average">${promedio}</div>
         </div>
     </body>
     </html>
@@ -116,7 +116,7 @@ function htmlMessageGEC(promedio, carrera){
             <h2 class="subtitle">A continuación, te presentamos la retroalimentación de tu ejercicio en la carrera de:</h2>
             <br>
             <h2 class="subtitle">${carrera}:</h2>
-            <div class="average"> ${promedio} / 100</div>
+            <div class="average">${promedio}</div>
             <p>${mensaje}</p>
         </div>
     </body>
