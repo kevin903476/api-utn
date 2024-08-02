@@ -372,6 +372,18 @@ app.get('/getPromedio', async (request, response) => {
       response.status(500).json({ error: 'Internal Server Error' });
     }
 });
+app.get('/getCarreraITI', async (request, response) => {
+    try {
+      const db = dbService.getDbServiceInstance();
+  
+      const data = await db.getCarreraITI();
+  
+      response.json({ data: data });
+    } catch (err) {
+      console.log(err);
+      response.status(500).json({ error: 'Internal Server Error' });
+    }
+});
   
 app.get('/estadisticas-iti', (request, response) =>{
     const db = dbService.getDbServiceInstance();
