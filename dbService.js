@@ -64,7 +64,7 @@ class DbService {
     async getCarreraITI() {
         try {
             const results = await this.query(
-                "SELECT c.email, c.puntuacion_logico, c.puntuacion_progra, c.puntuacion_idioma, c.puntuacion_matematico, p.promedio, p.fecha FROM  carrera_iti c INNER JOIN promedios p ON c.email = p.email WHERE p.carrera = 'TECNOLOGÍAS DE INFORMACIÓN';"
+                "SELECT c.email, c.puntuacion_logico, c.puntuacion_progra, c.puntuacion_idioma, c.puntuacion_matematico, p.promedio,DATE_FORMAT(p.fecha, '%d-%m-%Y') as fecha_formateada FROM  carrera_iti c INNER JOIN promedios p ON c.email = p.email WHERE p.carrera = 'TECNOLOGÍAS DE INFORMACIÓN';"
             );
             return results;
         } catch (error) {
