@@ -84,7 +84,7 @@ class DbService {
     async getCarreraILE() {
         try {
             const results = await this.query(
-                "SELECT c.email, c.puntuacion_idioma, p.promedio,DATE_FORMAT(p.fecha, '%d-%m-%Y') as fecha_formateada FROM  carrera_ext c INNER JOIN promedios p ON c.email = p.email WHERE p.carrera = 'AGRONOMÍA' ORDER BY promedio DESC;"
+                "SELECT c.email, c.puntuacion_idioma, p.promedio,DATE_FORMAT(p.fecha, '%d-%m-%Y') as fecha_formateada FROM  carrera_ext c INNER JOIN promedios p ON c.email = p.email WHERE p.carrera = 'INGLÉS' ORDER BY promedio DESC;"
             );
             return results;
         } catch (error) {
@@ -94,7 +94,7 @@ class DbService {
     async getCarreraGEC() {
         try {
             const results = await this.query(
-                "SELECT c.email, c.puntuacion_act, p.promedio,DATE_FORMAT(p.fecha, '%d-%m-%Y') as fecha_formateada FROM  carrera_gec c INNER JOIN promedios p ON c.email = p.email WHERE p.carrera = 'AGRONOMÍA' ORDER BY promedio DESC;"
+                "SELECT c.email, c.puntuacion_act, p.promedio,DATE_FORMAT(p.fecha, '%d-%m-%Y') as fecha_formateada FROM  carrera_gec c INNER JOIN promedios p ON c.email = p.email WHERE p.carrera = 'GESTIÓN ECOTURÍSTICA' ORDER BY promedio DESC;"
             );
             return results;
         } catch (error) {
