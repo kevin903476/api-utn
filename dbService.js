@@ -53,7 +53,6 @@ class DbService {
             console.error(error);
         }
     }
-
     async getPromedio() {
         try {
             const results = await this.query("SELECT email, carrera, promedio, DATE_FORMAT(fecha, '%d-%m-%Y') as fecha_formateada FROM promedios ORDER BY promedio DESC");
@@ -61,7 +60,18 @@ class DbService {
         } catch (error) {
             console.error(error);
         }
-    }    
+    }  
+    async getCarreraITI() {
+        try {
+            const results = await this.query(
+                "SELECT c.email, c.puntuacion_logico, c.puntuacion_progra, c.puntuacion_idioma, c.puntuacion_mate, p.promedio, p.fecha FROM  carrera_iti c INNER JOIN promedios p ON c.email = p.email WHERE p.carrera = 'TECNOLOGÍAS DE INFORMACIÓN';"
+            );
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }   
+    
       async getUserByEmail(email) {
         try {
             const results = await this.query("SELECT email FROM usuarios WHERE email = ?", [email]);
