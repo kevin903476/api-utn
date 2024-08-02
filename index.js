@@ -384,6 +384,42 @@ app.get('/getCarreraITI', async (request, response) => {
       response.status(500).json({ error: 'Internal Server Error' });
     }
 });
+app.get('/getCarreraAGRO', async (request, response) => {
+    try {
+      const db = dbService.getDbServiceInstance();
+  
+      const data = await db.getCarreraAGRO();
+  
+      response.json({ data: data });
+    } catch (err) {
+      console.log(err);
+      response.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+app.get('/getCarreraILE', async (request, response) => {
+    try {
+      const db = dbService.getDbServiceInstance();
+  
+      const data = await db.getCarreraILE();
+  
+      response.json({ data: data });
+    } catch (err) {
+      console.log(err);
+      response.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+app.get('/getCarreraGEC', async (request, response) => {
+    try {
+      const db = dbService.getDbServiceInstance();
+  
+      const data = await db.getCarreraGEC();
+  
+      response.json({ data: data });
+    } catch (err) {
+      console.log(err);
+      response.status(500).json({ error: 'Internal Server Error' });
+    }
+});
   
 app.get('/estadisticas-iti', (request, response) =>{
     const db = dbService.getDbServiceInstance();
