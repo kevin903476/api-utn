@@ -4,19 +4,19 @@ const e = require('cors');
 
 dotenv.config();
 
-// Crear un pool de conexiones
+
 const pool = mysql.createPool({
     host: process.env.HOST,
     user: process.env.USER,
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
     port: process.env.DB_PORT,
-    connectionLimit: 20, // El valor de las conexiones
-    queueLimit: 0, // No limitar el número de solicitudes en espera
-    acquireTimeout: 10000 // Tiempo de espera para obtener una conexión (en milisegundos)
+    connectionLimit: 20, 
+    queueLimit: 0, 
+    acquireTimeout: 10000 
 });
 
-// Promesas para facilitar el uso de async/await
+
 const poolPromise = pool.promise();
 
 class DbService {
