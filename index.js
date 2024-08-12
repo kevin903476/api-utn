@@ -28,11 +28,11 @@ async function sendEmail(email, message, sub){
     });
     try {
         const info = await transporter.sendMail({
-            from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
-            to: email, // list of receivers
-            subject: sub, // Subject line
+            from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', 
+            to: email, 
+            subject: sub, 
             
-            html: message, // html body
+            html: message, 
         });
         console.log("Mesaje enviado: " + info.messageId)
     } catch (error) {
@@ -191,45 +191,6 @@ app.post('/send-email-iti', async (request, response) => {
    
    
 
-    /* const { email } = request.body;
-    const db = dbService.getDbServiceInstance();
-
-    try {
-         // Verificar si el usuario existe
-      const email = await db.getUserByEmail(email);
-      if (userResults.length === 0) {
-        return response.status(404).json({ error: 'Usuario no encontrado' });
-      }
-  
-      // Obtener el promedio del usuario
-      const promedioResults = await db.getPromedioByEmail(email);
-      if (promedioResults.length === 0) {
-        return response.status(404).json({ error: 'Promedio no encontrado para el usuario' });
-      }
-
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true, 
-            auth: {
-              user: "utnestudiantes8@gmail.com",
-              pass: "kddeucuzewldghry",
-            },
-        });
-        transporter.verify().then(() =>{
-            console.log('listo para enviar emails');
-            
-        });
-        await transporter.sendMail({
-            from: '"Herramienta UTN" <utnestudiantes8@gmail.com>', // sender address
-            to: email, // list of receivers
-            subject: "Hello ✔", // Subject line
-            text: "Hello world?", // plain text body
-            html: "<b>Hello world?</b>", // html body
-        });
-    } catch (error) {
-        console.error(error);
-    } */
 });
 
 app.post('/send-email-agro', async (request, response) => {
@@ -483,7 +444,7 @@ app.post('/obtenerUserPass', async (request, response) => {
             const compare = await bcryptjs.compare(contra, user.contra);
 
             if (compare) {
-                response.json({ email: email, contra: user.contra });  // Devolvemos el correo y la contraseña encriptada
+                response.json({ email: email, contra: user.contra });  
             } else {
                 response.status(401).json({ error: 'Correo o contraseña incorrectos' });
             }
