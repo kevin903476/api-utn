@@ -457,6 +457,26 @@ app.post('/obtenerUserPass', async (request, response) => {
     }
 });
 
+app.post('/getUserEncuestaIti', (request, response) =>{
+    const { email} = request.body;
+    const db = dbService.getDbServiceInstance();
+
+    const result = db.getUserIti(email);
+    
+    result
+    .then(data => response.json({data}))
+    .catch(err => console.log(err)); 
+});
+
+app.post('/insertEncuestaITI', (request, response) =>{
+    const {email, respuesta } = request.body;
+    const db = dbService.getDbServiceInstance();
+    const result = db.insertEncuestaITI(email, respuesta)
+
+    result
+    .then(data => response.json({data : data}))
+    .catch(err => console.log(err))
+});
 
 app.post('/getUserIti', (request, response) =>{
     const { email} = request.body;

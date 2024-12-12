@@ -182,6 +182,25 @@ class DbService {
         }
     }
     
+    async getUserEncuestaIti(email) {
+        try {
+            const results = await this.query("SELECT * FROM encuestaITI WHERE email = ?", [email]);
+            return results;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+    async insertEncuestaITI(email, respuesta) {
+        try {
+            const results = await this.query("INSERT INTO encuestaITI (email, respuesta) VALUES (?, ?)", [email, respuesta]);
+            return {
+                email: email,
+                respuesta: respuesta
+            };
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     async getUserIti(email) {
         try {
