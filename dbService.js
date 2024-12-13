@@ -182,7 +182,7 @@ class DbService {
         }
     }
     
-    async getUserEncuestaIti(email) {
+    async getUserEncuestaITI(email) {
         try {
             const results = await this.query("SELECT * FROM encuestaITI WHERE email = ?", [email]);
             return results;

@@ -457,11 +457,11 @@ app.post('/obtenerUserPass', async (request, response) => {
     }
 });
 
-app.post('/getUserEncuestaIti', (request, response) =>{
+app.post('/getUserEncuestaITI', (request, response) =>{
     const { email} = request.body;
     const db = dbService.getDbServiceInstance();
 
-    const result = db.getUserIti(email);
+    const result = db.getUserEncuestaITI(email);
     
     result
     .then(data => response.json({data}))
